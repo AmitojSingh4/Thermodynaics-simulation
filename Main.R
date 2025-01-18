@@ -1,16 +1,16 @@
-# size of lattice (n x n)
-n <- 10
 
-# number of quanta / pixel (integer)
-Q <- 1
+CreateArray <- function(n){
+  A <- array(Q, dim = c(n, n))
+  for (i in 1:n) {
+    for (j in 1:n) {
+      Q <- sample(c(-1,1),size = 1)
+      A[i,j] <- Q
+    }
+  }
+  return(A)
+}
 
-# make initial lattice
-A <- array(Q, dim = c(n, n))
-
-J <- 1
-
-
-epsilon <- function(i,j) { #Energy of a single atom
+Epsilon <- function(i,j) { #Energy of a single atom
   energy <- -J*(A[i,j]*(GetValue(i+1,j)+GetValue(i-1,j)+GetValue(i,j+1)+GetValue(i,j-1)))
   return(energy)
 }
@@ -28,7 +28,7 @@ E <- function() { #Total energy of the entire lattice
   E <- 0
   for (i in 1:n) {
     for (j in 1:n) {
-      E <- E + epsilon(i,j)
+      E <- E + Epsilon(i,j)
     }
   }
   return(E)
@@ -44,5 +44,12 @@ M <- function() { #Total magnetization of the lattice
   return(M)
 }
 
-print(E())
-print(M())
+Main <- function() {
+  n <<- 10 #Size of lattice (n x n)
+  J <<- 1
+  A <<- CreateArray(n)
+  print(E())
+  print(M())
+}
+
+Main()
