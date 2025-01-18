@@ -10,12 +10,12 @@ A <- array(Q, dim = c(n, n))
 J <- 1
 
 
-GetEnergy <- function(i,j) {
+epsilon <- function(i,j) { #Energy of a single atom
   energy <- -J*(A[i,j]*(GetValue(i+1,j)+GetValue(i-1,j)+GetValue(i,j+1)+GetValue(i,j-1)))
   return(energy)
 }
 
-GetValue <- function(a,b) {
+GetValue <- function(a,b) { #Sanitation for edge cases
   if ((0<a&a<n)&(0<b&b<n)) {
     return(A[a,b])
   }
@@ -24,4 +24,25 @@ GetValue <- function(a,b) {
   }
 }
 
-print(GetEnergy(4,4))
+E <- function() { #Total energy of the entire lattice
+  E <- 0
+  for (i in 1:n) {
+    for (j in 1:n) {
+      E <- E + epsilon(i,j)
+    }
+  }
+  return(E)
+}
+
+M <- function() { #Total magnetization of the lattice
+  M <- 0
+  for (i in 1:n) {
+    for (j in 1:n) {
+      M <- M + A[i,j]
+    }
+  }
+  return(M)
+}
+
+print(E())
+print(M())
