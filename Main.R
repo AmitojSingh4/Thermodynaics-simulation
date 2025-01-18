@@ -74,12 +74,26 @@ DeltaE <- function() {
   return(dE)
 }
 
+AcceptFlip <- function() {
+  dE <- DeltaE()
+  if (dE <= 0) {
+    A <- ATemp
+  }
+  else if(sample(c(1:100),size = 1) >= p*100) {
+    A <- ATemp
+  }
+}
+
 Main <- function() {
-  n <<- 10 #Size of lattice (n x n)
+  n <<- 100 #Size of lattice (n x n)
+  iterations <- 100000
   J <<- 1 #Coupling constant
+  p <<- 0.1 #Probability of accepting
   A <<- CreateArray(n)
+  for (t in 1:iterations) {
+    AcceptFlip()
+  }
   image(A)
-  print(DeltaE())
 }
 
 Main()
