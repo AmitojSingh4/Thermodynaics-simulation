@@ -10,10 +10,18 @@ A <- array(Q, dim = c(n, n))
 J <- 1
 
 
-Energy <- function(i,j) {
-  A[i]
+GetEnergy <- function(i,j) {
+  energy <- -J*(A[i,j]*(GetValue(i+1,j)+GetValue(i-1,j)+GetValue(i,j+1)+GetValue(i,j-1)))
+  return(energy)
 }
 
-x <- array(1:20, dim=c(4,5))
-print (x)
-print(x[4,2])
+GetValue <- function(a,b) {
+  if ((0<a&a<n)&(0<b&b<n)) {
+    return(A[a,b])
+  }
+  else {
+    return(0)
+  }
+}
+
+print(GetEnergy(4,4))
