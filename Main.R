@@ -1,17 +1,10 @@
 
 CreateArray <- function(n){ #Creates array of size nxn 
-  A <- array(Q, dim = c(n, n))
-  for (i in 1:n) {
-    for (j in 1:n) {
-      Q <- sample(c(-1,1),size = 1)
-      A[i,j] <- Q
-    }
-  }
-  return(A)
+  lattice <- array(sample(c(-1,1),size = n*n, replace=TRUE), dim = c(n,n))
 }
 
 Epsilon <- function(i,j,array) { #Energy of a single element
-  if ((0<i&i<n)&(0<j&j<n)) {
+  if ((0<i&i<=n)&(0<j&j<=n)) {
   energy <- -J*(array[i,j]*(GetValue(i+1,j,array)+GetValue(i-1,j,array)+GetValue(i,j+1,array)+GetValue(i,j-1,array)))
   }
   else {
@@ -21,7 +14,7 @@ Epsilon <- function(i,j,array) { #Energy of a single element
 }
 
 GetValue <- function(a,b,array) { #Sanitation for edge cases
-  if ((0<a&a<n)&(0<b&b<n)) {
+  if ((0<a&a<=n)&(0<b&b<=n)) {
     return(array[a,b])
   }
   else {
@@ -46,7 +39,7 @@ M <- function(array) { #Total magnetization of the lattice
       M <- M + array[i,j]
     }
   }
-  return(M)
+  return(M/(n^2))
 }
 
 Flip <- function() { #Flips the spin of a random element
@@ -70,28 +63,32 @@ DeltaE <- function() { #Calculates the change in energy
   LocalEAfter <- Epsilon(FEI,FEJ,ATemp) + Epsilon(FEI+1,FEJ,ATemp) + Epsilon(FEI-1,FEJ,ATemp) + Epsilon(FEI,FEJ+1,ATemp) + Epsilon(FEI,FEJ-1,ATemp)
   EAfter <<- EBefore - LocalEBefore + LocalEAfter
   dE <- EAfter - EBefore
-  return(dE)
+  return(array(c(dE,FEI,FEJ), dim = c(1,3)))
 }
 
-AcceptFlip <- function() { 
-  dE <- DeltaE()
+AcceptFlip <- function() { #Updates the array depending on the
+  dEData <- DeltaE()
+  dE <- dEData[1,1]
+  i <- dEData[1,2]
+  j <- dEData[1,3]
   if (dE <= 0) {
-    A <- ATemp
+    A[i,j] <<- ATemp[i,j]
     EBefore <- EAfter
   }
-  else if(sample(c(1:100),size = 1) >= exp(-(dE*11605)/Temperature)*100) {
-    A <- ATemp
+  else if(sample(c(1:100),size = 1) <= exp(-(dE*1)/Temperature)*100) {
+    A[i,j] <<- ATemp[i,j]
     EBefore <- EAfter
   }
 }
 
 Main <- function() {
   n <<- 100 #Size of lattice (n x n)
-  iterations <- 100000 #Number of iterations to run the simulation
-  Temperature <<- 10 #Temperature of lattice in kelvin
+  iterations <- 1000000 #Number of iterations to run the simulation
+  Temperature <<- 9 #Temperature of lattice in kelvin
   J <<- 1 #Coupling constant
   A <<- CreateArray(n)
   EBefore <<- E(A)
+  print(A)
   for (t in 1:iterations) {
     AcceptFlip()
     if (t%%1000 == 0) {
