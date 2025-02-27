@@ -66,7 +66,7 @@ DeltaE <- function() { #Calculates the change in energy
   return(array(c(dE,FEI,FEJ), dim = c(1,3)))
 }
 
-AcceptFlip <- function() { #Updates the array depending on the
+AcceptFlip <- function() { #Updates the array depending on the dE
   dEData <- DeltaE()
   dE <- dEData[1,1]
   i <- dEData[1,2]
@@ -75,27 +75,33 @@ AcceptFlip <- function() { #Updates the array depending on the
     A[i,j] <<- ATemp[i,j]
     EBefore <- EAfter
   }
-  else if(sample(c(1:100),size = 1) <= exp(-(dE*1)/Temperature)*100) {
+  else if(sample(c(1:100),size = 1) <= exp(-(dE*1)/(Temperature*k))*100) {
     A[i,j] <<- ATemp[i,j]
     EBefore <- EAfter
   }
 }
 
 Main <- function() {
-  n <<- 100 #Size of lattice (n x n)
-  iterations <- 1000000 #Number of iterations to run the simulation
-  Temperature <<- 9 #Temperature of lattice in kelvin
+  n <<- 50 #Size of lattice (n x n)
+  iterations <- 10^6 #Number of iterations to run the simulation
+  Temperature <<- 4 #Temperature of lattice in kelvin
+  k <<- 1 #Boltzman's constant
   J <<- 1 #Coupling constant
   A <<- CreateArray(n)
   EBefore <<- E(A)
-  print(A)
+  #print(A)
+  #magnetisation <<- c(1:iterations)
+  #energyOfSystem <<- c(1:iterations)
   for (t in 1:iterations) {
     AcceptFlip()
-    if (t%%1000 == 0) {
+    #magnetisation[t] <<- M(A)
+    #energyOfSystem[t] <<- E(A)
+    if (t%%10000 == 0) {
       print(t)
     }
   }
   image(A)
+  #plot(energyOfSystem,c(1:iterations))
 }
 
 Main()
